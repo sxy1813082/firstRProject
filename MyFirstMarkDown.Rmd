@@ -1,0 +1,47 @@
+---
+title: "MyFirstRMarkdown"
+author: "MyFirstRMarkdown"
+date: "2022-09-28"
+output: html_document
+---
+```{r}
+animals <- c("Snakes","Ostrich","Cat","Spider")
+num_legs <- c(0,2,4,8)
+animals_df <- data.frame(animals,num_legs)
+```
+```{r}
+print(animals_df)
+```
+```{r}
+X <- matrix(seq(12,2,by = -2),2,3)
+Y <- matrix(seq(4),2,2)
+Z <- matrix(seq(4,10,by = 2),2,2)
+print(Y%*%X)
+```
+# by是to-from/length-1,小数点除外
+## create a function
+```{r}
+myFirstRFunc <- function(num){
+  stop
+}
+```
+```{r}
+myFirstRFunc <- function(num){
+  sum = 0
+  for(i in seq(num-1)){
+    if(i%%2==0||i%%7==0){
+      sum = i + sum
+    }
+  }
+  return(sum)
+}
+myFirstRFunc(1000)
+```
+## Wave plot
+```{r}
+x = seq(0.00,20.00,by = 0.01)
+y = sin(x)
+sin_df = data.frame(x,y)
+head(sin_df,3)
+polt(sin_df)
+```
