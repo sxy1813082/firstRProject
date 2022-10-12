@@ -43,5 +43,4 @@ x = seq(0.00,20.00,by = 0.01)
 y = sin(x)
 sin_df = data.frame(x,y)
 head(sin_df,3)
-polt(sin_df)
 ```

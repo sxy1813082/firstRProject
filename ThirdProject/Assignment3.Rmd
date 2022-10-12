@@ -1,0 +1,96 @@
+---
+title: "Assignment3"
+author: "Assignment3"
+date: "2022-10-12"
+output: html_document
+---
+# Q1
+```{r}
+library(tidyverse)
+library(Stat2Data)
+data("Hawks")
+c<-Hawks$Tail
+print(mean(c))
+```
+# Q2
+```{r}
+k<-Hawks %>% summarise(Wing_mean=mean(Wing,na.rm=TRUE),Wing_t_mean=mean(Wing,na.rm=TRUE,trim=0.5),Wing_med=median(Wing,na.rm=TRUE))
+print(k)
+kk<-Hawks %>%group_by(Species)%>% summarise(Wing_mean=mean(Wing,na.rm=TRUE),Wing_t_mean=mean(Wing,na.rm=TRUE,trim=0.5),Wing_med=median(Wing,na.rm=TRUE))
+print(kk)
+```
+## 1.4
+```{r}
+hal<-Hawks$Hallux
+hal<-hal[!is.na(hal)]
+outlier_val<-100
+num_outliers<-10
+corrupted_hal<-c(hal,rep(outlier_val,times=num_outliers))
+mean(hal)
+mean(corrupted_hal)
+num_outliers_vect <- seq(0,1000)
+means_vect <- c()
+for(num_outliers in num_outliers_vect){
+corrupted_hal <- c(hal,rep(outlier_val,times=num_outliers))
+means_vect <- c(means_vect, mean(corrupted_hal))
+}
+medians_vect<-c()
+for(num_outliers in num_outliers_vect){
+corrupted_hal <- c(hal,rep(outlier_val,times=num_outliers))
+medians_vect <- c(medians_vect, median(corrupted_hal))
+}
+t_means_vect<-c()
+for(num_outliers in num_outliers_vect){
+corrupted_hal <- c(hal,rep(outlier_val,times=num_outliers))
+t_means_vect <- c(t_means_vect, mean(corrupted_hal,trim=0.1))
+}
+df_means_medians <- data.frame(num_outliers=num_outliers_vect, mean=means_vect,
+t_mean=t_means_vect, median=medians_vect)
+df_means_medians %>%
+pivot_longer(!num_outliers, names_to = "Estimator", values_to = "Value") %>%
+ggplot(aes(x=num_outliers,color=Estimator, linetype=Estimator,y=Value)) +
+geom_line()+xlab("Number of outliers")
+```
+## 1.5
+```{r}
+ggplot(data=Hawks,aes(x=Species,y=Weight))+geom_boxplot()+xlab('Species')+ylab('Weight')
+cc<-Hawks%>%select(Species,Weight)%>%group_by(Species)
+summarise(cc,quantitile025=quantile(Weight,probs=0.25,na.rm=TRUE),quantitle050=quantile(Weight,probs=0.50,na.rm=TRUE),quantitle075=quantile(Weight,probs=0.75,na.rm=TRUE))
+```
+## 1.5 Q3
+```{r}
+num_outliers <-function(c){
+  min<-quantile(c,probs = 0.25,na.rm = TRUE)-1.5*IQR(c,na.rm = TRUE)
+  max<-quantile(c,probs = 0.75,na.rm = TRUE)+1.5*IQR(c,na.rm = TRUE)
+  sum<-0
+  for(i in seq(along=c)){
+    if(c[i]<min||c[i]>max){
+      sum<-sum+1
+    }
+  }
+  return(sum)
+}
+num_outliers(c(0, 40,60,185))
+cc<-Hawks%>%select(Species,Weight)%>%group_by(Species,na.rm=TRUE)
+summarise(cc, num_outliers_weight=num_outliers(as.integer(na.omit(Weight))))
+```
+# 1.6
+```{r}
+cov(Hawks$Weight,Hawks$Wing,use='complete.obs')
+cor(Hawks$Weight,Hawks$Wing,use='complete.obs')
+tt<-Hawks%>%select(Species,Tail)%>%group_by(Species)
+
+ggplot(data=tt,aes(x=Tail,color=Species))+xlab("Tail")+geom_density(na.rm = FALSE)+ylab("density")
+
+ggplot(data=tt,aes(x=Tail,y=Species,fill=Species,color=Species))+xlab("Tail")+geom_violin()
+uu<-na.omit(Hawks%>%select(Species,Tail,Weight)%>%group_by(Species))
+ggplot(data=uu,aes(x=Tail,y=Weight))+xlab("Tail")+ylab("Weight")+geom_point(aes(color=Species,shape=Species))
+
+ggplot(data=uu,aes(x=Tail,y=Weight))+xlab("Tail")+ylab("Weight")+geom_point(aes(color=Species))+geom_smooth()+facet_wrap(~Species)
+
+d<-Hawks%>%filter(Weight>=2000&Tail>175)
+xx<-c(d$Tail);
+yy<-c(d$Weight);
+ggplot(data=uu,aes(x=Tail,y=Weight))+xlab("Tail")+ylab("Weight")+geom_point(aes(color=Species,shape=Species))+geom_curve(x=200,xend=xx[1],y=1800,yend=yy[1],arrow=arrow(length = unit(0.5,'cm')),curvature = 0.1)+geom_text(x=225,y=2050,label="see this is outstanding")
+
+```

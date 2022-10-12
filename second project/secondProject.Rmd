@@ -1,0 +1,102 @@
+---
+title: "Assignment2"
+author: "Untitled"
+date: "2022-10-05"
+output: html_document
+---
+## 1.1 (Q1)
+```{r}
+library(tidyverse)
+library(Stat2Data)
+data("Hawks")
+data <- filter(Hawks,Species=='RT'&Weight>=1000)%>%select(Wing,Weight,Tail)
+```
+##1.2
+```{r}
+data <- arrange(data,Wing)
+head(data,n=5)
+```
+## 1.3
+```{r}
+species_code <-c("CH","RT","SS")
+species_name_full <-c("Cooper's","Red-tailed","Sharp-shinned")
+hawkSpeciesNameCodes <- data.frame(species_code,species_name_full)
+print(hawkSpeciesNameCodes)
+k <- rename(hawkSpeciesNameCodes,Species = species_code)
+k <- left_join(Hawks,k)
+kk <- left_join(Hawks,k)
+k <- select(k,species_name_full,Wing,Weight,Tail)
+hawksFullName <-head(rename(k,Species=species_name_full),n=7)
+print(hawksFullName)
+```
+## 1.4
+```{r}
+BMI <- mutate(Hawks,BMI_bird = (1000*Weight)/(Wing*Wing))
+BMI <- select(BMI,Species,BMI_bird)
+BMI <- arrange(BMI,desc(BMI_bird))
+```
+## 1.5
+```{r}
+kk <- group_by(kk,species_name_full)%>%summarise(num_rows = n(),mn_wing=mean(Wing),md_wing=median(Wing),t_mn_wing=mean(Wing)-0.1,b_wt_ratio=max(Wing/Tail))
+print(kk)
+
+Hi <- select(Hawks,Species,Wing,Weight,Crop)%>%group_by(Species)%>%summarise(across(everything(),~sum(is.na(.x))))
+print(Hi)
+```
+## 2
+```{r}
+x <- seq(0,10,by=0.1)
+ok <- function(x){
+  ook <- function(k){
+    return(k*5+1)
+  }
+  return(map_dbl(x,ook))
+}
+y <- ok(x)
+df_xy <- data.frame(x,y)
+print(df_xy%>%head(5))
+miss <- function(x){
+  ook <- function(k){
+    if((k+0.1)%%0.5 == 0)
+      return(NA)
+    else
+      return(k*5+1)
+  }
+  return(map_dbl(x,ook))
+}
+y <-miss(x)
+df_xy_miss<- data.frame(x,y)
+print(df_xy_miss%>%head(10))
+
+impute_by_mean<-function(xx){
+  mu<-median(xx,na.rm=1)
+  impute_f<-function(z){
+    if(is.na(z)){
+      return(mu) 
+    }else{
+      return(z)
+      }
+    }
+  return(map_dbl(xx,impute_f))
+}
+xy <- mutate(df_xy_miss,y=impute_by_mean(y))
+print(xy %>% head(6))
+```
+## 2.2
+```{r}
+library(readxl)
+HockeyLeague <- read_excel("D:/Bristol course/Statistic/firstRProject/second project/HockeyLeague.xlsx")
+datas <- head(select(HockeyLeague,1:7),n=3)
+print(datas)
+
+wins_data_frame <- pivot_longer(datas,c('1990','1991','1992','1993','1994','1995'),names_to = 'Year',values_to='WT')
+wins_data_frame <- separate(wins_data_frame,WT,into=c("Wins","Total"),sep = " of ")
+print(wins_data_frame)
+
+```
+## plot
+```{r}
+univar_plot <- ggplot(data=wins_data_frame, aes(x=Wins)) + xlab("Wins")
+univar_plot+geom_bar(width = 3)+ylab("Count")
+
+```
