@@ -2,9 +2,17 @@
 title: "Assignment3"
 author: "Assignment3"
 date: "2022-10-12"
-output: html_document
+header-includes:
+  - \usepackage{ctex}
+output:
+  word_document: default
+  pdf_document:
+    includes:
+      keep_tex: yes
+    latex_engine: xelatex
+  html_document: default
 ---
-# Q1
+# 1 start
 ```{r}
 library(tidyverse)
 library(Stat2Data)
@@ -12,14 +20,14 @@ data("Hawks")
 c<-Hawks$Tail
 print(mean(c))
 ```
-# Q2
+# 1.1&1.2
 ```{r}
 k<-Hawks %>% summarise(Wing_mean=mean(Wing,na.rm=TRUE),Wing_t_mean=mean(Wing,na.rm=TRUE,trim=0.5),Wing_med=median(Wing,na.rm=TRUE))
 print(k)
 kk<-Hawks %>%group_by(Species)%>% summarise(Wing_mean=mean(Wing,na.rm=TRUE),Wing_t_mean=mean(Wing,na.rm=TRUE,trim=0.5),Wing_med=median(Wing,na.rm=TRUE))
 print(kk)
 ```
-## 1.4
+# 1.4
 ```{r}
 hal<-Hawks$Hallux
 hal<-hal[!is.na(hal)]
@@ -51,7 +59,7 @@ pivot_longer(!num_outliers, names_to = "Estimator", values_to = "Value") %>%
 ggplot(aes(x=num_outliers,color=Estimator, linetype=Estimator,y=Value)) +
 geom_line()+xlab("Number of outliers")
 ```
-## 1.5
+# 1.5
 ```{r}
 ggplot(data=Hawks,aes(x=Species,y=Weight))+geom_boxplot()+xlab('Species')+ylab('Weight')
 cc<-Hawks%>%select(Species,Weight)%>%group_by(Species)
@@ -74,7 +82,7 @@ num_outliers(c(0, 40,60,185))
 cc<-Hawks%>%select(Species,Weight)%>%group_by(Species,na.rm=TRUE)
 summarise(cc, num_outliers_weight=num_outliers(as.integer(na.omit(Weight))))
 ```
-# 1.6
+# 3 Visualisation
 ```{r}
 cov(Hawks$Weight,Hawks$Wing,use='complete.obs')
 cor(Hawks$Weight,Hawks$Wing,use='complete.obs')
